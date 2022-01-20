@@ -1,0 +1,21 @@
+{
+  "environment": "web",
+  "format": "html",
+  "prefix": "https://storage.googleapis.com",
+  "updated": "2022-01-20T06:10:15Z",
+  "id": "line-bot-device-remote-control-handson",
+  "duration": 16,
+  "title": "LINE Botで画面の彼方のデバイスを遠隔操作してみよう ハンズオンテキスト",
+  "authors": "Kenichiro KIMURA、Kenichiro Wada",
+  "summary": "LINE Botで画面の彼方のデバイスを遠隔操作してみようハンズオンテキストです。",
+  "source": "1FOZuWCFJ6_Tp7NnpPhoPpSrihjg-t0vetNI7EKdlTtI",
+  "theme": "100-basic",
+  "status": [
+    "published"
+  ],
+  "category": [
+    "100-Basic"
+  ],
+  "tags": [],
+  "url": "line-bot-device-remote-control-handson"
+}

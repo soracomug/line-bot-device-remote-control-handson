@@ -1,0 +1,236 @@
+
+<!doctype html>
+
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="theme-color" content="#4F7DC9">
+  <meta charset="UTF-8">
+  <title>LINE Botで画面の彼方のデバイスを遠隔操作してみよう ハンズオンテキスト</title>
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Source+Code+Pro:400|Roboto:400,300,400italic,500,700|Roboto+Mono">
+  <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://storage.googleapis.com/codelab-elements/codelab-elements.css">
+  <style>
+    .success {
+      color: #1e8e3e;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <google-codelab-analytics gaid=""></google-codelab-analytics>
+  <google-codelab codelab-gaid=""
+                  id="line-bot-device-remote-control-handson"
+                  title="LINE Botで画面の彼方のデバイスを遠隔操作してみよう ハンズオンテキスト"
+                  environment="web"
+                  feedback-link="">
+    
+      <google-codelab-step label="ハンズオンを始める前に" duration="5">
+        <h2 is-upgraded>前提</h2>
+<ul>
+<li>PC (Windows もしくは macOSで、ブラウザはChrome、もしくは Firefoxをインストールしておいてください)</li>
+<li>LINEのアカウント(メールアドレスとパスワードの登録をお願いします。登録手順は<a href="https://guide.line.me/ja/account-and-settings/account-and-profile/set-email-address.html" target="_blank">こちら</a>)</li>
+<li>AWSアカウント (中級者向けの内容をやる場合。AWSアカウントの作成手順はこちら)</li>
+</ul>
+<h2 is-upgraded>構成図</h2>
+<p class="image-container"><img style="width: 601.70px" src="img/2d2aef7262416aeb.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="利用するサービスについて" duration="1">
+        <h2 is-upgraded>AWS Lambdaについて</h2>
+<p>今回のハンズオンでは、AWS Lambda(以下Lambda)を使ってLINE Botを作成します(初級者の方は運営が準備したBotを利用していただきます)。</p>
+<p>AWS Lambdaについては以下の公式ページを参照してください。</p>
+<p><a href="https://aws.amazon.com/jp/lambda/" target="_blank">https://aws.amazon.com/jp/lambda/</a></p>
+<p>Lambdaにコードをデプロイする方法はいくつかありますが、今回は運営が準備したコードをAWSコンソールから貼り付けてデプロイします。</p>
+<h3 is-upgraded>利用料金</h3>
+<p>Lambdaの利用料金は以下の公式ページをご覧ください。<br><br><a href="https://aws.amazon.com/jp/lambda/pricing/" target="_blank">https://aws.amazon.com/jp/lambda/pricing/</a></p>
+<p>今回のハンズオンの内容は無料枠の中でご利用いただけます。翌月以降も費用が発生することはまずありませんが、不安な方はハンズオン終了後にリソースを削除してください。</p>
+<h2 is-upgraded>Amazon API Gatewayについて</h2>
+<p>今回のハンズオンでは、LINE Botに対してインターネットからはAmazon API Gateway(以下API Gateway)を使ってアクセスします。<br></p>
+<p>API Gatewayについて詳しくは以下の公式ページを参照ください。</p>
+<p><a href="https://aws.amazon.com/jp/api-gateway/" target="_blank">https://aws.amazon.com/jp/api-gateway/</a></p>
+<h3 is-upgraded>利用料金</h3>
+<p>API Gatewayの利用料金は以下の公式ページをご覧ください。<br><br><a href="https://aws.amazon.com/jp/api-gateway/pricing/" target="_blank">https://aws.amazon.com/jp/api-gateway/pricing/</a><br><br>今回のハンズオンの内容は無料枠の中でご利用いただけます。翌月以降も費用が発生することはまずありませんが、不安な方はハンズオン終了後にリソースを削除してください。</p>
+<h2 is-upgraded>Amazon DynamoDBについて</h2>
+<p>今回のハンズオンでは、LINE Messaging APIの秘匿情報(チャネルシークレット/アクセストークン)をAmazon DynamoDB(以下DynamoDB)に保存し、チャネルIDをキーにしてLambdaから取得します。</p>
+<p>DynamoDBならびにDynamoDBに秘匿情報を登録するためのページは運営が準備しています。</p>
+<p>DynamoDBについては以下の公式ページをご覧ください。</p>
+<p><a href="https://aws.amazon.com/jp/dynamodb/" target="_blank">https://aws.amazon.com/jp/dynamodb/</a></p>
+<h2 is-upgraded>AWS IoT CoreならびにSORACOM Beamについて</h2>
+<p>今回のハンズオンでは、AWS IoT Core(以下IoT Core)ならびに「データ転送サービス SORACOM Beam」(以下、Beam)を用いてLINE Botからの命令をデバイスに届けます。</p>
+<p>LINE BotがIoT CoreのMQTTトピックにメッセージを送信すると、Beam経由でMQTTトピックにサブスクライブしているデバイスにメッセージが届き、デバイスはそのメッセージに従って動作します。</p>
+<p>今回はIoT CoreならびBeam、デバイスは運営で準備したものを利用します。</p>
+<p>IoT Coreについて詳しくは以下の公式ページをご覧ください。</p>
+<p><a href="https://aws.amazon.com/jp/iot-core/" target="_blank">https://aws.amazon.com/jp/iot-core/</a></p>
+<p>Beamについて詳しくは以下の公式ページをご覧ください。<br><a href="https://soracom.jp/services/arc/" target="_blank">https://soracom.jp/services/beam/</a></p>
+<h2 is-upgraded>LINE Messaging APIについて</h2>
+<p>今回のハンズオンでは、LINE Messaging APIを使ってBotを作成し、LINEからデバイスに対して命令を送ります。</p>
+<p>LINE Messaging APIについて詳しくは以下の公式ページを参照ください。<br></p>
+<p><a href="https://developers.line.biz/ja/services/messaging-api/" target="_blank">https://developers.line.biz/ja/services/messaging-api/</a></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="LINE Messaging APIチャネルの作成と設定" duration="5">
+        <p>LINE Botのアカウント(LINE Messaging APIチャネル)を作成します。</p>
+<p>以下の公式ドキュメントに従い、Messaging APIチャネルを作成してください。</p>
+<p><a href="https://developers.line.biz/ja/docs/messaging-api/getting-started/#using-console" target="_blank">https://developers.line.biz/ja/docs/messaging-api/getting-started/#using-console</a></p>
+<p>LINE Developerコンソールで、作成したMessaging APIチャネルのチャネルID、チャネルシークレット、長期のチャネルアクセストークンを取得してメモしておいてください。</p>
+<p>長期のチャネルアクセストークンについては以下の公式ドキュメントを参考にしてください。</p>
+<p><a href="https://developers.line.biz/ja/docs/messaging-api/channel-access-tokens/#long-lived-channel-access-tokens" target="_blank">https://developers.line.biz/ja/docs/messaging-api/channel-access-tokens/#long-lived-channel-access-tokens</a></p>
+<h2 is-upgraded>チャネルシークレット等の登録</h2>
+<p>今回のハンズオンでは、LINE Messaging APIの秘匿情報(チャネルシークレット/チャネルアクセストークン)を運営が準備したDynamoDBに保存します。</p>
+<p>DynamoDBへの登録は、運営が準備した以下のURLから行えます。先ほど保存したチャネルID、チャネルシークレット、チャネルアクセストークンを入力します。<br><br><a href="https://www.appsheet.com/start/d8bc91a1-e3a5-4802-aaf5-d665ed747c4e" target="_blank">https://www.appsheet.com/start/d8bc91a1-e3a5-4802-aaf5-d665ed747c4e</a></p>
+<p>初回アクセス時には以下の画面が表示されますので、「ACCEPT」を押します。</p>
+<p class="image-container"><img style="width: 601.70px" src="img/5ec4bb9124676fd9.png"></p>
+<p>チャネルID、チャネルシークレット、チャネルアクセストークンを入力し、「Save」を押します。<br><img style="width: 601.70px" src="img/f17ead958a15ed77.png"></p>
+<p>保存中は以下のように右上に赤丸の数字が表示されます。<br><img style="width: 601.70px" src="img/d922e12635c27462.png"></p>
+<p>以下のように表示されたら成功です。<br><img style="width: 601.70px" src="img/6e1c4d2bdf3c2293.png"></p>
+<h2 is-upgraded>Webhook URLの設定</h2>
+<p>LINE Messaging APIチャネルに、Webhook URLを設定します。これによって、チャネルととLINE Bot(Lambdaで動いているプログラム)を接続します。まずは、運営が準備しているBotと接続してみます。</p>
+<p>Messaging APIチャネルの「Messaging API設定」タブをクリックします。</p>
+<p>設定するURLは「https://fk04uljrmf.execute-api.us-west-2.amazonaws.com/prod/{channel_id} 」です。例えばあなたのチャネルIDが「123456」の場合、設定するURLは「https://fk04uljrmf.execute-api.us-west-2.amazonaws.com/prod/123456」です。</p>
+<p>Webhook URLの設定方法は以下の公式ドキュメントを参考にしてください。セキュリティの設定は不要です。</p>
+<p><a href="https://developers.line.biz/ja/docs/messaging-api/building-bot/#setting-webhook-url" target="_blank">https://developers.line.biz/ja/docs/messaging-api/building-bot/#setting-webhook-url</a></p>
+<p>Webhookの動作を確認します。Webhook URLの設定の下にある「検証」ボタンを押し、下図のように「成功」と表示されることを確認します。<br><img style="width: 601.70px" src="img/c25ba2fdd4b61353.png"></p>
+<p><br>メルプメッセージをbotが返すように設定します。<br>Webhookの下の「Webhookの利用」をONに(スライダーを右に)します。<br><img style="width: 601.70px" src="img/4253a45be8f05e19.png"></p>
+<p>その下の「LINE公式アカウント設定」の「応答メッセージ」の「編集」を押します。<br><img style="width: 601.70px" src="img/555263ac967a8f84.png"></p>
+<p>LINE Official Account Managerがブラウザの別ウインドウ(タブ)で開きます。</p>
+<p>応答モードを「Bot」、応答メッセージを「オフ」、Webhookを「オン」に変えます。</p>
+<p class="image-container"><img style="width: 601.70px" src="img/6c5cad298fc85466.png"></p>
+<p>トラブルシューティング</p>
+<p>設定がうまく進まないときにご覧ください。ここまでの作業が出来ている場合は次に進んでください。</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="動作確認" duration="0">
+        <p>実際に動作させてみましょう。</p>
+<h2 is-upgraded>LINE Botと友達になる</h2>
+<p><a href="https://developers.line.biz/console/" target="_blank">LINE Developersコンソール</a>の［Messaging API設定］タブにあるQRコードを読み取り、LINE Botと友達になります。</p>
+<h2 is-upgraded>LINE Botに命令を送る</h2>
+<p>適当なメッセージをLINE Botに送る(トークルームで送信する)と、ヘルプメッセージが取得できます。</p>
+<p class="image-container"><img style="width: 355.50px" src="img/6a79b72cc1729b5d.png"></p>
+<p>このメッセージに従い、「回転する角度(スペース)回転速度」というメッセージをBotに送ります。まずはサンプル通り「360 150」と入れてみます。ここまでの設定が正しく終わっていればzoomの画面に映っているデバイスが回転しますので、zoomの画面に注目してください。</p>
+<p class="image-container"><img style="width: 420.14px" src="img/bcba37115671d322.png"></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="中級編:Botを自分の環境にデプロイする" duration="0">
+        <p>ここまでの手順では皆さんのLINE Messaging APIを運営が準備したBotに接続して動作させましたが、ここからはBotを皆さんの環境にデプロイしてみます。</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="AWS Lambdaへのデプロイ" duration="0">
+        <p>AWS LambdaにBotのプログラムをデプロイします。</p>
+<p>まず、<a href="https://console.aws.amazon.com/" target="_blank">AWSコンソール</a>にアクセスします。右上のリージョンが「バージニア北部」になっていない場合は、プルダウンから変更してください。<br><img style="width: 601.70px" src="img/41ba54644c85ed6d.png"><br>検索窓に「lambda」と入れてLambdaのコンソールにアクセスします。<br><img style="width: 601.70px" src="img/cd9af8ce0a964374.png"></p>
+<p>「関数の作成」を押し、新しい関数を作成します。<br><img style="width: 601.70px" src="img/3cbafba31c5061c3.png"></p>
+<p>関数のタイプで「一から作成」を選び、関数名は「soracom-linedc-handson-20220128」と入力、ランタイムは「Python3.9」を選びます。それ以外の部分はデフォルトのままで「関数の作成」を押します。</p>
+<p class="image-container"><img style="width: 601.70px" src="img/6c2bc959a85bf80c.png"></p>
+<p>コードソースに入っているデフォルトのコードを削除し、こちらのソースコードをそのまま貼り付けます。</p>
+<p>そして、「Deploy」ボタンを押してコードをデプロイします。</p>
+<p class="image-container"><img style="width: 601.70px" src="img/a52670778ab9ac3b.png"></p>
+<p>「設定」→「環境変数」→「編集」を押し、このLambda関数の環境変数を設定します。<br><img style="width: 601.70px" src="img/735597a131000461.png"></p>
+<p>「環境変数の追加」を6回押し、キーと値を入力する枠を6個作ります。そこに以下のキーと値を入れて、「保存」を押します。<br>・ DEST_AWS_ACCESS_KEY_ID → 当日運営にお問い合わせください</p>
+<p>・ DEST_AWS_SECRET_ACCESS_KEY → 当日運営にお問い合わせください</p>
+<p>・ DEST_ENDPOINT_URL → 当日運営にお問い合わせください</p>
+<p>・ DEST_REGION_NAME → 当日運営にお問い合わせください</p>
+<p>・ LINE_CHANNEL_SECRET → あなたのMessaging APIチャネルのチャネルシークレット</p>
+<p>・ LINE_CHANNEL_ACCESS_TOKEN → あなたのMessaging APIチャネルのチャネルアクセストークン</p>
+<p class="image-container"><img style="width: 601.70px" src="img/88b19a0e96e20d6a.png"><br></p>
+<p>保存したら、次にLambdaの実行時間(タイムアウト)を変更します。「一般設定」から「編集」を押します。<br><img style="width: 601.70px" src="img/c19a1f7a0134b9be.png"></p>
+<p>デフォルトではタイムアウトが3秒になっているので、これを30秒に変更して「保存」を押します。<br><img style="width: 601.70px" src="img/4986d196120e7f85.png"><br>保存できたら、動作テストを行います。</p>
+<p>「テスト」を押し、テストイベントの名前に「test」と入力し、JSONが記載されている部分に以下のJSONを貼り付け、「変更を保存」を押します。<br></p>
+<pre><code>{
+  &#34;headers&#34;: {
+    &#34;x-line-signature&#34;: &#34;LaGMWOqhEn84qmUAlwCx6OLOTe26Y4l0chpPItEKThM=&#34;
+  },
+  &#34;pathParameters&#34;: {
+    &#34;channel_id&#34;: &#34;9876543210&#34;
+  },
+  &#34;requestContext&#34;: {
+    &#34;stage&#34;: &#34;test-invoke-stage&#34;
+  },
+  &#34;body&#34;: &#34;{\&#34;events\&#34;:[{\&#34;replyToken\&#34;:\&#34;DUMMY\&#34;,\&#34;message\&#34;:{\&#34;text\&#34;:\&#34;90 120\&#34;}}]}&#34;
+}</code></pre>
+<p class="image-container"><img style="width: 601.70px" src="img/46dafae62faf265d.png"></p>
+<p>保存したら、「テスト」ボタンを押します。下図のように、「実行結果:成功」と出ていれば成功です。<br><img style="width: 601.70px" src="img/40698be7201dea52.png"><br></p>
+<h2 is-upgraded>トラブルシューティング</h2>
+<p>設定がうまく進まないときにご覧ください。ここまでの作業が出来ている場合は次に進んでください。</p>
+<p>・コードのコピペが崩れてる、全角スペースが入ってるなどコードの問題</p>
+<p>・テストイベントでコピペする値が間違ってる</p>
+<p>・成功したけど、想定通りの動作じゃない。ー＞「Deploy」ボタンを押し忘れている</p>
+<p>・タイムアウトエラーが出る。</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Amazon API Gatewayの設定" duration="0">
+        <p>AWS Lambdaにインターネットから接続できるように、Amazon API Gatewayを使ってHTTP REST APIのエンドポイントを作成します。<br><br>まず、<a href="https://console.aws.amazon.com/" target="_blank">AWSコンソール</a>にアクセスし、検索窓に「api」と入れてAPI Gatewayのコンソールにアクセスします。<br><img style="width: 601.70px" src="img/98a5500fd85d247c.png"></p>
+<p>「APIを作成」を押します。<br><img style="width: 601.70px" src="img/8e9a89655a99e090.png"></p>
+<p>REST APIの「インポート」を押します。<br><img style="width: 601.70px" src="img/31f08e9f96b99118.png"></p>
+<p>「プロトコル」は「REST」を、「新しいAPIの作成」は「Swagger あるいは Open API 3 からインポート」を選択します。</p>
+<p>「Swagger あるいは Open API 3 からインポート」のところにこちらのJSONを貼り付けます。</p>
+<p>「エンドポイントタイプ」は「リージョン」を選びます。</p>
+<p>全ての入力・選択が終わったら「インポート」を押します。<br><img style="width: 601.70px" src="img/88f64bd63fa396e4.png"></p>
+<p>下図のような画面に遷移すればインポート(作成)は成功です。<br><img style="width: 601.70px" src="img/bbda8770ab9e6d2.png"><br>「/{channnen_id}」をクリックし、「今すぐ定義」をクリックします。<br><img style="width: 601.70px" src="img/e73dab4fccbb1af.png"></p>
+<p>「統合タイプ」で「Lambda関数」を選びます。「Lambdaプロキシ統合の使用」にチェックを入れます。「Lambdaリージョン」で先ほどLambda関数をデプロイしたus-east-1を選択します。</p>
+<p>「Lambda関数」の入力枠をクリックするとus-east-1にデプロイされているLambda関数の一覧が選べるので、「soracom-linedc-handson-20220128」を選びます。</p>
+<p>全ての選択と入力が終わったら「保存」を押します。</p>
+<p class="image-container"><img style="width: 601.70px" src="img/c7ab8122296daa27.png"></p>
+<p>以下の警告が出るので、「OK」を押します。<br><img style="width: 601.70px" src="img/9530035a9b538103.png"></p>
+<p>以下のような画面になれば成功です。<br><img style="width: 601.70px" src="img/a075b564e4c41d79.png"></p>
+<p>「アクション」のプルダウンから「APIのデプロイ」を選択します。<br><img style="width: 601.70px" src="img/801877dbf9d08c7.png"></p>
+<p>「デプロイされるステージ」で「[新しいステージ]」を選び、「ステージ名」に「prod」と入れ、「デプロイ」を押します。<br><img style="width: 601.70px" src="img/ca55e14e6a88e67c.png"></p>
+<p>下図のようになったら成功です。「URLの呼び出し」の所にあるURLがMessaging APIチャネルに設定するエンドポイントになりますので、これをコピーします。<br><img style="width: 601.70px" src="img/765b142dceacf8b0.png"></p>
+<p>コピーしたURLの後ろにあなたのMessaging APIチャネルのチャネルIDをつけ、Messaging APIチャネルの設定でWebhook URLに登録して動作確認を行ってください。</p>
+<h2 is-upgraded>トラブルシューティング</h2>
+<p>設定がうまく進まないときにご覧ください。ここまでの作業が出来ている場合は次に進んでください。</p>
+<p>・インポートできない(JSONの貼り付け失敗してない？)</p>
+<p>・Lambda関数が出てこない(リージョン間違えてない？)</p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="後片付け" duration="0">
+        <p>放置しておいても、課金が発生することはありませんが、後片付けを行います。</p>
+<h2 is-upgraded>LINE Messaging APIチャネルの削除(全員)</h2>
+<p>コンソールから削除</p>
+<h2 is-upgraded>AWS Lambda関数の削除(中級をやった方)</h2>
+<p>コンソールから削除</p>
+<h2 is-upgraded>Amazon API Gatewayの削除(中級をやった方)</h2>
+<p>コンソールから削除</p>
+<p><strong>ここまでで、ハンズオンは終了です。お疲れ様でした！</strong></p>
+
+
+      </google-codelab-step>
+    
+      <google-codelab-step label="Appendix" duration="0">
+        <p>wioで動いてるスケッチあるので、IoT CoreとBeam設定したらwioやarduinoなどで動かせる。ただし回転させるのはデバイスが高いのでそこをLチカあたりに書き換えてその手順を掲載する？</p>
+<p>(時間があれば。なければappendix自体を削除)</p>
+<p>解説: IoT Core 側の設定</p>
+<p>IoT Core</p>
+<p>SORACOM Beam</p>
+<p>デバイス</p>
+<p>解説: 本格的な利用に向けて</p>
+<p>トークンチェック → オーソライザ―へ</p>
+
+
+      </google-codelab-step>
+    
+  </google-codelab>
+
+  <script src="https://storage.googleapis.com/codelab-elements/native-shim.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/custom-elements.min.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/prettify.js"></script>
+  <script src="https://storage.googleapis.com/codelab-elements/codelab-elements.js"></script>
+  <script src="//support.google.com/inapp/api.js"></script>
+
+</body>
+</html>
