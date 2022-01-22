@@ -93,7 +93,8 @@
 <h2 is-upgraded>Webhook URLの設定</h2>
 <p>LINE Messaging APIチャネルに、Webhook URLを設定します。これによって、チャネルととLINE Bot(Lambdaで動いているプログラム)を接続します。まずは、運営が準備しているBotと接続してみます。</p>
 <p>Messaging APIチャネルの「Messaging API設定」タブをクリックします。</p>
-<p>設定するURLは「https://fk04uljrmf.execute-api.us-west-2.amazonaws.com/prod/{channel_id} 」です。例えばあなたのチャネルIDが「123456」の場合、設定するURLは「https://fk04uljrmf.execute-api.us-west-2.amazonaws.com/prod/123456」です。</p>
+<p>当日運営から入手したURLを設定します。URL中の「{channel_id}」の部分はあなたのMessaging APIチャネルのチャネルIDを設定します。</p>
+<p>例えば運営から入手したURLが「https://xxxxxxxxxxxx/{channel_id} 」で、あなたのチャネルIDが「123456」の場合、設定するURLは「https://xxxxxxxxxxxx/123456」です。</p>
 <p>Webhook URLの設定方法は以下の公式ドキュメントを参考にしてください。セキュリティの設定は不要です。</p>
 <p><a href="https://developers.line.biz/ja/docs/messaging-api/building-bot/#setting-webhook-url" target="_blank">https://developers.line.biz/ja/docs/messaging-api/building-bot/#setting-webhook-url</a></p>
 <p>Webhookの動作を確認します。Webhook URLの設定の下にある「検証」ボタンを押し、下図のように「成功」と表示されることを確認します。<br><img style="width: 601.70px" src="img/c25ba2fdd4b61353.png"></p>
@@ -123,6 +124,15 @@
     
       <google-codelab-step label="中級編:Botを自分の環境にデプロイする" duration="0">
         <p>ここまでの手順では皆さんのLINE Messaging APIを運営が準備したBotに接続して動作させましたが、ここからはBotを皆さんの環境にデプロイしてみます。</p>
+<h2 is-upgraded>デプロイするコードのダウンロード</h2>
+<p>以下のURLから、運営が準備したコード一式をダウンロードします。</p>
+<p><a href="https://github.com/soracomug/line-bot-device-remote-control-handson/blob/main/files/handson.zip" target="_blank">https://github.com/soracomug/line-bot-device-remote-control-handson/blob/main/files/handson.zip</a></p>
+<p>「ダウンロード」ボタンを押してください。<br><img style="width: 601.70px" src="img/42f731a4fda29f8d.png"></p>
+<p>ダウンロードしたhandson.zipファイルを展開してください。以下の2つのファイルが含まれていることを確認します。<br></p>
+<ul>
+<li>linebot-for-handson-20220128.py</li>
+<li>linebot-incoming-for-handson-20220128.json</li>
+</ul>
 
 
       </google-codelab-step>
@@ -133,7 +143,7 @@
 <p>「関数の作成」を押し、新しい関数を作成します。<br><img style="width: 601.70px" src="img/3cbafba31c5061c3.png"></p>
 <p>関数のタイプで「一から作成」を選び、関数名は「soracom-linedc-handson-20220128」と入力、ランタイムは「Python3.9」を選びます。それ以外の部分はデフォルトのままで「関数の作成」を押します。</p>
 <p class="image-container"><img style="width: 601.70px" src="img/6c2bc959a85bf80c.png"></p>
-<p>コードソースに入っているデフォルトのコードを削除し、こちらのソースコードをそのまま貼り付けます。</p>
+<p>コードソースに入っているデフォルトのコードを削除し、先ほどダウンロードしたファイル「linebot-for-handson-20220128.py」の内容をそのまま貼り付けます。</p>
 <p>そして、「Deploy」ボタンを押してコードをデプロイします。</p>
 <p class="image-container"><img style="width: 601.70px" src="img/a52670778ab9ac3b.png"></p>
 <p>「設定」→「環境変数」→「編集」を押し、このLambda関数の環境変数を設定します。<br><img style="width: 601.70px" src="img/735597a131000461.png"></p>
@@ -163,10 +173,10 @@
 <p>保存したら、「テスト」ボタンを押します。下図のように、「実行結果:成功」と出ていれば成功です。<br><img style="width: 601.70px" src="img/40698be7201dea52.png"><br></p>
 <h2 is-upgraded>トラブルシューティング</h2>
 <p>設定がうまく進まないときにご覧ください。ここまでの作業が出来ている場合は次に進んでください。</p>
-<p>・コードのコピペが崩れてる、全角スペースが入ってるなどコードの問題</p>
-<p>・テストイベントでコピペする値が間違ってる</p>
-<p>・成功したけど、想定通りの動作じゃない。ー＞「Deploy」ボタンを押し忘れている</p>
-<p>・タイムアウトエラーが出る。</p>
+<p>・コードのコピペが崩れてる、全角スペースが入ってるなどコードの問題: ファイルは文字コード UTF-8になっていますので、ファイルを開いたエディタによってはShiftJISになってしまいますと、文字化けします。エディタの設定で、UTF-8で開き直してください。</p>
+<p>・成功したけど、想定通りの動作じゃない。: linebot-for-handson-20220128.pyの内容を貼り付けたあと、「Deploy」ボタンを押し忘れてますと、コードの変更が反映されず以下のような実行結果が表示されます。エディタ画面で「Deploy」ボタンを押してください。</p>
+<p class="image-container"><img style="width: 601.70px" src="img/bd65db8d3956f75e.png"></p>
+<p>・タイムアウトエラーが出る。: タイムアウト時間が初期設定の3秒のままだと、初回起動時にタイムアウトエラーになることがあります。タイムアウト時間の変更を行ってください。</p>
 
 
       </google-codelab-step>
@@ -176,7 +186,7 @@
 <p>「APIを作成」を押します。<br><img style="width: 601.70px" src="img/8e9a89655a99e090.png"></p>
 <p>REST APIの「インポート」を押します。<br><img style="width: 601.70px" src="img/31f08e9f96b99118.png"></p>
 <p>「プロトコル」は「REST」を、「新しいAPIの作成」は「Swagger あるいは Open API 3 からインポート」を選択します。</p>
-<p>「Swagger あるいは Open API 3 からインポート」のところにこちらのJSONを貼り付けます。</p>
+<p>「Swagger あるいは Open API 3 からインポート」のところに、先ほどダウンロードしたファイル「linebot-incoming-for-handson-20220128.json」の内容を貼り付けます。</p>
 <p>「エンドポイントタイプ」は「リージョン」を選びます。</p>
 <p>全ての入力・選択が終わったら「インポート」を押します。<br><img style="width: 601.70px" src="img/88f64bd63fa396e4.png"></p>
 <p>下図のような画面に遷移すればインポート(作成)は成功です。<br><img style="width: 601.70px" src="img/bbda8770ab9e6d2.png"><br>「/{channnen_id}」をクリックし、「今すぐ定義」をクリックします。<br><img style="width: 601.70px" src="img/e73dab4fccbb1af.png"></p>
@@ -192,8 +202,8 @@
 <p>コピーしたURLの後ろにあなたのMessaging APIチャネルのチャネルIDをつけ、Messaging APIチャネルの設定でWebhook URLに登録して動作確認を行ってください。</p>
 <h2 is-upgraded>トラブルシューティング</h2>
 <p>設定がうまく進まないときにご覧ください。ここまでの作業が出来ている場合は次に進んでください。</p>
-<p>・インポートできない(JSONの貼り付け失敗してない？)</p>
-<p>・Lambda関数が出てこない(リージョン間違えてない？)</p>
+<p>・インポートできない場合 : 指定したファイルが誤っていないか確認をお願いします。</p>
+<p>・Lambda関数が出てこない : API GatewayがあるリージョンとLambdaのリージョンが異なっている場合、Lambda関数が出てきません。同一のリージョンで作業するようにしてください。</p>
 
 
       </google-codelab-step>
@@ -201,11 +211,35 @@
       <google-codelab-step label="後片付け" duration="0">
         <p>放置しておいても、課金が発生することはありませんが、後片付けを行います。</p>
 <h2 is-upgraded>LINE Messaging APIチャネルの削除(全員)</h2>
-<p>コンソールから削除</p>
+<p>LINE Developerコンソールで、作成したプロバイダーの「Action」をクリックします。</p>
+<p class="image-container"><img style="width: 543.50px" src="img/57ac80d829acdbac.png"></p>
+<p>作成したチャネルをクリックします</p>
+<p class="image-container"><img style="width: 298.50px" src="img/a551954544722f6f.png"></p>
+<p>チャネル画面下部の「削除」をクリックします。</p>
+<p class="image-container"><img style="width: 290.50px" src="img/a213ab7c0a2da910.png"></p>
+<p>ダイアログで「LINE Official Account Managerを表示」をクリックします。</p>
+<p class="image-container"><img style="width: 519.50px" src="img/8b92f7d35ba5fe5f.png"></p>
+<p>遷移した画面で、「上記の注意事項を理解して、アカウントの削除に同意します」のチェックボックスにチェックを入れ、「アカウントを削除」をクリックします。</p>
+<p class="image-container"><img style="width: 481.50px" src="img/789c049e5a0c3365.png"></p>
+<p>ダイアログで「削除」をクリックします。</p>
+<p class="image-container"><img style="width: 431.50px" src="img/a170650c19a8ea85.png"></p>
+<p>チャネル一覧に何も表示するまで、上記の作業を繰り返します。</p>
+<p class="image-container"><img style="width: 499.50px" src="img/9541dbf765af8cb3.png"></p>
+<p>プロバイダー設定タブを選んで、下部のプロバイダーの削除にある「削除」をクリックします。</p>
+<p class="image-container"><img style="width: 443.92px" src="img/d46b34d2a9f1132b.png"></p>
+<p>ダイアログで、プロバイダーIDを入力し、「上記に同意し、このプロバイダーの永久削除を希望します。」のチェックボックスにチェックを入れて、「削除」をクリックします。</p>
+<p class="image-container"><img style="width: 418.50px" src="img/d31ba4ddb5e6a6c.png"></p>
+<p>以上で、プロバイダーの削除は完了です。</p>
 <h2 is-upgraded>AWS Lambda関数の削除(中級をやった方)</h2>
-<p>コンソールから削除</p>
+<p>Lambdaのコンソール画面で、「soracom-linedc-handson-20220128」のチェックボックスにチェックを入れて、右上の「アクション」プルダウン内の「削除」をクリックします。</p>
+<p class="image-container"><img style="width: 540.50px" src="img/927e8d38948ba4aa.png"></p>
+<p>ダイアログで、関数を確認の上、「削除」をクリックします。</p>
+<p class="image-container"><img style="width: 529.50px" src="img/ae60ab45ac55b93d.png"></p>
 <h2 is-upgraded>Amazon API Gatewayの削除(中級をやった方)</h2>
-<p>コンソールから削除</p>
+<p>API Gatewayのコンソールにて、「linebot-incoming-for-handson-20220128」のラジオボタンを選択し、右上の「アクション」プルダウン内の「Delete」をクリックします。</p>
+<p class="image-container"><img style="width: 536.50px" src="img/c8c9a67b6a14e91a.png"></p>
+<p>ダイアログでAPI名が確認の上、「削除」をクリックします。</p>
+<p class="image-container"><img style="width: 481.50px" src="img/1f7366c4db4d7a5b.png"></p>
 <p><strong>ここまでで、ハンズオンは終了です。お疲れ様でした！</strong></p>
 
 

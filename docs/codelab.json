@@ -2,7 +2,7 @@
   "environment": "web",
   "format": "html",
   "prefix": "https://storage.googleapis.com",
-  "updated": "2022-01-20T06:10:15Z",
+  "updated": "2022-01-22T16:52:28Z",
   "id": "line-bot-device-remote-control-handson",
   "duration": 16,
   "title": "LINE Botで画面の彼方のデバイスを遠隔操作してみよう ハンズオンテキスト",
