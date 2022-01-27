@@ -32,7 +32,7 @@
 <ul>
 <li>PC (Windows もしくは macOSで、ブラウザはChrome、もしくは Firefoxをインストールしておいてください)</li>
 <li>LINEのアカウント(メールアドレスとパスワードの登録をお願いします。登録手順は<a href="https://guide.line.me/ja/account-and-settings/account-and-profile/set-email-address.html" target="_blank">こちら</a>)</li>
-<li>AWSアカウント (中級者向けの内容をやる場合。AWSアカウントの作成手順はこちら)</li>
+<li>AWSアカウント (中級者向けの内容をやる場合。AWSアカウントの作成手順は<a href="https://aws.amazon.com/jp/register-flow/" target="_blank">こちら</a>)</li>
 </ul>
 <h2 is-upgraded>構成図</h2>
 <p class="image-container"><img style="width: 601.70px" src="img/2d2aef7262416aeb.png"></p>
@@ -105,6 +105,7 @@
 <p class="image-container"><img style="width: 601.70px" src="img/6c5cad298fc85466.png"></p>
 <p>トラブルシューティング</p>
 <p>設定がうまく進まないときにご覧ください。ここまでの作業が出来ている場合は次に進んでください。</p>
+<p>Webhookの動作確認のときにタイムアウトが起きる：Lambdaを立ち上げている最中にタイムアウトになっている可能性があります。再度「検証」ボタンを押してください。</p>
 
 
       </google-codelab-step>
@@ -240,6 +241,12 @@
 <p class="image-container"><img style="width: 536.50px" src="img/c8c9a67b6a14e91a.png"></p>
 <p>ダイアログでAPI名が確認の上、「削除」をクリックします。</p>
 <p class="image-container"><img style="width: 481.50px" src="img/1f7366c4db4d7a5b.png"></p>
+<h2 is-upgraded>IAMロールの削除(中級をやった方)</h2>
+<p>IAMのコンソールを開いて左のペインから「ロール」をクリックします。</p>
+<p>検索欄に今回作成したLambda関数名の「soracom-linedc-handson-20220128」を入れたときに表示されるIAMロールにチェックを入れて「削除」ボタンをクリックします。</p>
+<p class="image-container"><img style="width: 601.70px" src="img/a177fffebac03c2b.png"></p>
+<p>ダイアログが表示されたらテキストフィールドにロール名を入力して「削除」ボタンをクリックします。</p>
+<p class="image-container"><img style="width: 601.70px" src="img/9483171191145c80.png"></p>
 <p><strong>ここまでで、ハンズオンは終了です。お疲れ様でした！</strong></p>
 
 
