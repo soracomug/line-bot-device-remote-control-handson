@@ -76,7 +76,12 @@
       </google-codelab-step>
     
       <google-codelab-step label="LINE Messaging APIチャネルの作成と設定" duration="5">
-        <p>LINE Botのアカウント(LINE Messaging APIチャネル)を作成します。</p>
+        <h2 is-upgraded>概要</h2>
+<p>LINEとシステムを連動させるには「LINE Messaging API」を利用します。LINE上では「Bot（ボット; 仮想的なユーザー）」として振舞い、メッセージの入力を受け付けてシステムへ転送したり、またシステムの処理結果をメッセージとしてLINEに表示します。</p>
+<p>この作業ではBotの作成と、そのBotを動かすための認証情報の入手を行います。これは本ハンズオンだけでなく、今後も一般的に行う作業です。</p>
+<p>また本ハンズオンでは、まず全員が運営で用意しているシステムを経由してデバイスを操作します。そのため入手した認証情報を、運営で用意しているシステムに保存してもらいます。（この作業は本ハンズオン限定の作業です）</p>
+<h2 is-upgraded>作業</h2>
+<p>LINE Botのアカウント(LINE Messaging APIチャネル)を作成します。</p>
 <p>以下の公式ドキュメントに従い、Messaging APIチャネルを作成してください。</p>
 <p><a href="https://developers.line.biz/ja/docs/messaging-api/getting-started/#using-console" target="_blank">https://developers.line.biz/ja/docs/messaging-api/getting-started/#using-console</a></p>
 <p>LINE Developerコンソールで、作成したMessaging APIチャネルのチャネルID、チャネルシークレット、長期のチャネルアクセストークンを取得してメモしておいてください。</p>
@@ -89,7 +94,7 @@
 <p class="image-container"><img style="width: 601.70px" src="img/5ec4bb9124676fd9.png"></p>
 <p>チャネルID、チャネルシークレット、チャネルアクセストークンを入力し、「Save」を押します。<br><img style="width: 601.70px" src="img/f17ead958a15ed77.png"></p>
 <p>保存中は以下のように右上に赤丸の数字が表示されます。<br><img style="width: 601.70px" src="img/d922e12635c27462.png"></p>
-<p>以下のように表示されたら成功です。<br><img style="width: 601.70px" src="img/6e1c4d2bdf3c2293.png"></p>
+<p>以下のように表示されたら成功です。成功したらこのページは閉じることができます。<br><img style="width: 601.70px" src="img/6e1c4d2bdf3c2293.png"></p>
 <h2 is-upgraded>Webhook URLの設定</h2>
 <p>LINE Messaging APIチャネルに、Webhook URLを設定します。これによって、チャネルととLINE Bot(Lambdaで動いているプログラム)を接続します。まずは、運営が準備しているBotと接続してみます。</p>
 <p>Messaging APIチャネルの「Messaging API設定」タブをクリックします。</p>
@@ -98,7 +103,7 @@
 <p>Webhook URLの設定方法は以下の公式ドキュメントを参考にしてください。セキュリティの設定は不要です。</p>
 <p><a href="https://developers.line.biz/ja/docs/messaging-api/building-bot/#setting-webhook-url" target="_blank">https://developers.line.biz/ja/docs/messaging-api/building-bot/#setting-webhook-url</a></p>
 <p>Webhookの動作を確認します。Webhook URLの設定の下にある「検証」ボタンを押し、下図のように「成功」と表示されることを確認します。<br><img style="width: 601.70px" src="img/c25ba2fdd4b61353.png"></p>
-<p><br>メルプメッセージをbotが返すように設定します。<br>Webhookの下の「Webhookの利用」をONに(スライダーを右に)します。<br><img style="width: 601.70px" src="img/4253a45be8f05e19.png"></p>
+<p><br>ヘルプメッセージをbotが返すように設定します。<br>Webhookの下の「Webhookの利用」をONに(スライダーを右に)します。<br><img style="width: 601.70px" src="img/4253a45be8f05e19.png"></p>
 <p>その下の「LINE公式アカウント設定」の「応答メッセージ」の「編集」を押します。<br><img style="width: 601.70px" src="img/555263ac967a8f84.png"></p>
 <p>LINE Official Account Managerがブラウザの別ウインドウ(タブ)で開きます。</p>
 <p>応答モードを「Bot」、応答メッセージを「オフ」、Webhookを「オン」に変えます。</p>
@@ -124,7 +129,15 @@
       </google-codelab-step>
     
       <google-codelab-step label="中級編:Botを自分の環境にデプロイする" duration="0">
-        <p>ここまでの手順では皆さんのLINE Messaging APIを運営が準備したBotに接続して動作させましたが、ここからはBotを皆さんの環境にデプロイしてみます。</p>
+        <h2 is-upgraded>概要</h2>
+<p>ここまでの手順では皆さんのLINE Messaging APIを運営が準備したBotに接続して動作させましたが、ここからはBotを皆さんの環境にデプロイしてみます。</p>
+<p>構成図における「中級」の枠、AWS Lambdaの関数と、Amazon API Gateway によるWebhook受け付けです。</p>
+<p class="image-container"><img style="width: 601.70px" src="img/2d2aef7262416aeb.png"></p>
+<ul>
+<li>AWS Lambda: 運営側で用意しているAWS IoT Coreにデータを送信する &#34;関数&#34; を動かします。</li>
+<li>Amazon API Gateway:LINE Messaging API から &#34;Webhook&#34; で送信されてきたデータを、AWS Lambda 関数に引き渡します。</li>
+</ul>
+<p>構築の順番はAWS Lambda → Amazon API Gateway です。構築が済んでいるシステムに近い近い方から構築すると、1つずつ検証できるので構築が容易です。</p>
 <h2 is-upgraded>デプロイするコードのダウンロード</h2>
 <p>以下のURLから、運営が準備したコード一式をダウンロードします。</p>
 <p><a href="https://github.com/soracomug/line-bot-device-remote-control-handson/blob/main/files/handson.zip" target="_blank">https://github.com/soracomug/line-bot-device-remote-control-handson/blob/main/files/handson.zip</a></p>
@@ -253,14 +266,111 @@
       </google-codelab-step>
     
       <google-codelab-step label="Appendix" duration="0">
-        <p>wioで動いてるスケッチあるので、IoT CoreとBeam設定したらwioやarduinoなどで動かせる。ただし回転させるのはデバイスが高いのでそこをLチカあたりに書き換えてその手順を掲載する？</p>
-<p>(時間があれば。なければappendix自体を削除)</p>
-<p>解説: IoT Core 側の設定</p>
-<p>IoT Core</p>
-<p>SORACOM Beam</p>
-<p>デバイス</p>
-<p>解説: 本格的な利用に向けて</p>
-<p>トークンチェック → オーソライザ―へ</p>
+        <h2 is-upgraded><img style="width: 601.70px" src="img/2d2aef7262416aeb.png"> デバイスについて</h2>
+<p><a href="https://keigan-motor.com/km-1u/" target="_blank">Keigan Motor</a>という、モーターです。BLE、USB(UART)、I2Cで操作できます。Wio LTEとはI2Cで接続しています。</p>
+<h2 is-upgraded>デバイスの操作を行っているマイコンについて</h2>
+<p><a href="https://soracom.jp/store/5301/" target="_blank">Wio LTE JP Version</a>という、LTE通信内蔵のプロトタイプ向けSTM32マイコンです。Arduino IDEで開発できます。AWS IoT CoreとはSORACOM Beamを経由してMQTT(S)でつながります。即ち、デバイス側のI2Cと、クラウド側のMQTTを橋渡しする役割です。</p>
+<p>プログラム(Arduino IDEでは &#34;スケッチ&#34; と呼ばれている) は<a href="https://gist.github.com/ma2shita/38a6829a18b7112054e0a4ff02b4381c" target="_blank">こちらで公開</a>しています。</p>
+<p>ポイントは <code>mqtt_subscribe_callback</code> 関数です。この関数が「AWS IoT Core からのコマンドを振り分けて処理する」役割を持っています。抜粋したのが以下です。</p>
+<p>AWS IoT Core からのデータは <code>moveByDistanceDegree</code> といった文字列で送信されてくるため、それをマップ(対応表)を作っておき、そこから実際の処理に振り分けています。</p>
+<pre><code>void mqtt_subscribe_callback(...) {
+  std::map&lt;std::string, int&gt; cmd;
+  cmd[&#34;readMotorMeasurement&#34;] = 1;
+  cmd[&#34;moveByDistanceDegree&#34;] = 2;
+  cmd[&#34;reboot&#34;] = 65535;
+
+  switch(cmd[doc[&#34;method&#34;]]) {
+    case 1: // デバイスの状態報告
+      reportMotorMeasurement();
+      break;
+    case 2: // 回転処理
+      km_moveByDistanceDegree(doc[&#34;degree&#34;], doc[&#34;rpm&#34;]);
+      break;
+    case 65535: // 遠隔からのリセット
+      km_reboot();
+      delay(5000);
+      mcu_restart();
+      break;
+  }
+}</code></pre>
+<p>手元に動かせるデバイスが無くとも、例えば Wio LTE上のフルカラーLEDを光らせる(メソッドは <code>Wio.LedSetRGB()</code>) といった事もできるでしょう。</p>
+<h2 is-upgraded>AWS IoT Coreについて</h2>
+<p>AWS IoT Coreは、IoT デバイスと AWS 内のサービスをつなげるゲートウェイ(中継)サービスです。機能としては、MQTTブローカー(サーバー)や、着信データに応じてAWSサービスを実行する &#34;ルール(ACT)&#34; 、デバイスの状態を保存できる &#34;デバイスシャドウ&#34; 、デバイス上でLambda関数を動かすことできるAWS IoT Greengrassの制御やデバイス上の関数更新の指示を出せたりと、まさに &#34;ブローカー (仲介者)&#34; です。</p>
+<p>Web と AWS をつなげるサービスが Amazon API Gateway ならば、IoT デバイスと AWS をつなげるのが AWS IoT Core と言えるでしょう。</p>
+<p>今回はMQTTブローカーとしてのみ利用しています。</p>
+<h3 is-upgraded>異なるアカウントからAWS IoT Coreを呼び出す方法</h3>
+<p>今回はそれぞれのAWS Lambda 関数から、運営(というか、Maxの個人アカウント)のAWS IoT Coreを呼び出すようにしています。</p>
+<p>AWS IoT Core側(すなわち、MaxのAWS アカウント側)では、以下を行っています。</p>
+<ul>
+<li>AWS IAM: IoT Core を呼び出すための IAM ユーザーの作成とポリシーの設定、AccessKey/SecretAccessKeyのペアを払い出し</li>
+<li>AWS IoT Core: カスタムエンドポイントの払い出し</li>
+</ul>
+<p>これらが、Lambda関数作成者に <code>DEST_**</code> として配布された情報です。</p>
+<p>Lambda 関数では <code>boto3.client()</code> 呼び出し時に、クレデンシャルを指定するところがポイントです。特に <code>regon_name</code> を忘れると失敗します、なんででしょうね。</p>
+<pre><code>import boto3
+iot = boto3.client(&#39;iot-data&#39;,
+  region_name=os.getenv(&#39;DEST_REGION_NAME&#39;),
+  endpoint_url=os.getenv(&#39;DEST_ENDPOINT_URL&#39;),
+  aws_access_key_id=os.getenv(&#39;DEST_AWS_ACCESS_KEY_ID&#39;),   aws_secret_access_key=os.getenv(&#39;DEST_AWS_SECRET_ACCESS_KEY&#39;)
+  )
+  topic = &#39;wiolte-797973/command&#39;
+  payload = {}
+  iot.publish(topic=topic, payload=json.dumps(payload, ensure_ascii=False))</code></pre>
+<h2 is-upgraded>SORACOM Beam について</h2>
+<p>SOARCOM Beamは、データ転送サービスです。主な機能はプロトコル変換と、認証情報のオフロード(肩代わり)です。今回はWio LTE と IoT Core の間に入り、MQTTをMQTTS(MQTT+TLS)化するプロトコル変換と、IoT Coreに接続する際に必要となるX.509認証の肩代わりで利用しています。</p>
+<p>SORACOM Beam が無い場合、Wio LTEでは MQTTやデバイス制御のコード に加えて、 TLS 化や X.509認証のコード、そしてX.509証明書をマイコン内に書く必要があります。また、TLSは暗号化オーバーヘッドがあるため通信トラフィックも増えます。</p>
+<p>SORACOM は SIM によって通信ができている時点で認証が済んでいるため、その情報を基にクラウド連携に必要なプロトコル変換や認証情報の付与が可能です。</p>
+<p>このため、デバイス上からプロトコル実装(今回はTLS化)や、認証実装(今回はX.509証明書)が不要にできるため、デバイス開発を容易にします。</p>
+<p>実際、<a href="https://gist.github.com/ma2shita/38a6829a18b7112054e0a4ff02b4381c" target="_blank">今回のコード</a>にTLS実装をする場合、1000行近くのライブラリ(mbedTLS)を入れる必要があります。</p>
+<h3 is-upgraded>目的に合わせた SORACOM のクラウド連携サービス</h3>
+<p class="image-container"><img style="width: 601.70px" src="img/d38fab79fc82c4a6.png"></p>
+<h2 is-upgraded>本格的な利用に向けて ～ x-line-signature のチェック方法</h2>
+<p>LINE Messaging API から Amazon API Gateway へ Webhook を送信する際、Webhook が正当な呼び出しなのかをAPI 側で検証する方法が <code>x-line-signature</code> HTTP ヘッダです (仕様は<a href="https://developers.line.biz/ja/docs/messaging-api/receiving-messages/#verifying-signatures" target="_blank">こちら</a>)。</p>
+<p>AWS 上では、検証をするチャンスは2つあります。1つ目は Amazon API Gateway の「Lambda 認証 (Lambda オーソライザー)」 、2つ目は AWS Lambda 関数内です。本ハンズオンでは AWS Lambda 関数内で行いました。(検証は以下です。)</p>
+<pre><code># get channel secret and check x-line-signature
+cs = get_line_channel_secret(is_testing)
+body = event[&#39;body&#39;]
+sig = event[&#39;headers&#39;][&#39;x-line-signature&#39;]
+if not check_x_line_signature(cs, body, sig):
+    print(&#39;## Does not match x-line-signature, done.&#39;)
+    return {&#39;statusCode&#39;: 403, &#39;body&#39;: &#39;Does not match x-line-signature&#39;}</code></pre>
+<p>ハンズオンではわかりやすさを重視し、実処理を行う Lambda 関数内で検証も行いましたが、実用的にするには Amazon API Gateway の <a href="https://docs.aws.amazon.com/ja_jp/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html" target="_blank">Lambda 認証</a>の利用を強くお勧めします。</p>
+<p>といっても、実質は Lambda 関数にて検証するわけですが、Lambda 認証にすることで以下の利点とリスク回避が可能です。</p>
+<ul>
+<li>実処理を行う Lambda 関数の実装がシンプルになるため、テストの容易性が向上したり、更新しやすくなる。</li>
+<li>Lambda 関数を分離できるため、認証(署名検証)処理と実処理で、別の言語が選択できる。</li>
+</ul>
+<p>直接の実装は提示しませんが、参考になる実装として<a href="https://qiita.com/ma2shita/items/64328324bee3c922b4a3" target="_blank">Amazon API Gateway の Lambda オーソライザーで SORACOM Beam の署名検証</a>を紹介しておきます。Python 2.7実装なので、3系でのチャレンジを是非とも。</p>
+<h2 is-upgraded>AppSheet から Amazon DynamoDB の読み書きを行う</h2>
+<p>ノーコードで Web アプリが作れる<a href="https://www.appsheet.com/" target="_blank">AppSheet</a>は、データソースに Amazon DynamoDBを指定できます。以下の通りです。</p>
+<p class="image-container"><img style="width: 368.00px" src="img/587a89f5a47398c7.png"></p>
+<p>AppSheetに引き渡す必要のあるIAM ポリシーは以下の通りです。</p>
+<pre><code>{
+    &#34;Version&#34;: &#34;2012-10-17&#34;,
+    &#34;Statement&#34;: [
+        {
+            &#34;Sid&#34;: &#34;VisualEditor0&#34;,
+            &#34;Effect&#34;: &#34;Allow&#34;,
+            &#34;Action&#34;: &#34;dynamodb:ListTables&#34;,
+            &#34;Resource&#34;: &#34;*&#34;
+        },
+        {
+            &#34;Sid&#34;: &#34;VisualEditor1&#34;,
+            &#34;Effect&#34;: &#34;Allow&#34;,
+            &#34;Action&#34;: [
+                &#34;dynamodb:PutItem&#34;,
+                &#34;dynamodb:DeleteItem&#34;,
+                &#34;dynamodb:Scan&#34;,
+                &#34;dynamodb:Query&#34;,
+                &#34;dynamodb:UpdateItem&#34;
+            ],
+            &#34;Resource&#34;: &#34;arn:aws:dynamodb:*:*:table/YOUR_TABLE_NAME&#34;
+        }
+    ]
+}</code></pre>
+<h3 is-upgraded>AppSheetのカラム</h3>
+<p>AppSheetからAmazon DynamoDB のテーブルを利用する場合のカラムですが、既にテーブルに保存されているレコードからカラムを生成します。そのため、1件以上のレコードを入れておく必要があります。生成はDynamoDB テーブルの初回参照時、もしくは &#34;Regenerate Structure&#34; で生成してくれます。</p>
+<p>以上</p>
 
 
       </google-codelab-step>
